@@ -60,6 +60,14 @@ impl BytesBuffer {
         self.bytes.iter().map(|b| b.len()).sum()
     }
 
+    pub fn bytes_cnt(&self) -> usize {
+        self.bytes.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.bytes.len() == 0 || self.len() == 0
+    }
+
     pub fn push(&mut self, b: Bytes) {
         self.bytes.push(b);
     }
