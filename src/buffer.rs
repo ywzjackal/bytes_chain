@@ -77,12 +77,12 @@ impl BytesBuffer {
         self.set_min_position();
     }
 
-    pub fn bytes(&self, i: usize) -> &Bytes {
-        &self.bytes[i]
+    pub fn bytes(&self) -> &Vec<Bytes> {
+        &self.bytes
     }
 
-    pub fn bytes_mut(&mut self, i: usize) -> &mut Bytes {
-        &mut self.bytes[i]
+    pub fn bytes_mut(&mut self) -> &mut Vec<Bytes> {
+        &mut self.bytes
     }
 
     pub fn seek_from_start(&mut self, i: usize) {
