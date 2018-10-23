@@ -217,6 +217,12 @@ impl Iterator for BytesBuffer {
     }
 }
 
+impl AsRef<[u8]> for BytesBuffer {
+    fn as_ref(&self) -> &[u8] {
+        Buf::bytes(self)
+    }
+}
+
 #[test]
 fn test_bytes_buffer_normal() {
     let mut bb = BytesBuffer::new();
