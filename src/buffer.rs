@@ -162,6 +162,14 @@ impl BytesBuffer {
         }
         rt
     }
+
+    pub fn slice_from(&self, from: usize) -> BytesBuffer {
+        self.slice(from, self.len())
+    }
+
+    pub fn slice_to(&self, to: usize) -> BytesBuffer {
+        self.slice(0, to)
+    }
 }
 
 impl Index<usize> for BytesBuffer {
