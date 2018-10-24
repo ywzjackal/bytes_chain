@@ -61,6 +61,9 @@ impl ::BytesAble for Bytes {
         let l = target.len();
         target.copy_from_slice(&self.slice_at(from)[..l])
     }
+    fn for_each(&self, cb: &mut FnMut(&u8)) {
+        self.as_ref().iter().for_each(cb)
+    }
 }
 
 #[test]

@@ -15,6 +15,7 @@ pub trait BytesAble {
     fn at(&self, i: usize) -> u8;
     fn slice_at(&self, i: usize) -> &[u8];
     fn copy_to_slice(&self, from: usize, target: &mut [u8]);
+    fn for_each(&self, cb: &mut FnMut(&u8));
 }
 
 impl Index<usize> for BytesAble {
@@ -40,6 +41,9 @@ impl<T: AsRef<[u8]>> BytesAble for T {
     fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
         let l = target.len();
         target.copy_from_slice(&self.as_ref()[from..from + l]);
+    }
+    fn for_each(&self, cb:&mut FnMut(&u8)) {
+        self.as_ref().iter().for_each(cb)
     }
 }
 
