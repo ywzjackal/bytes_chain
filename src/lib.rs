@@ -1,5 +1,7 @@
-extern crate bytes as other_bytes;
-
+mod bytes;
 mod buffer;
+mod number;
 
+pub use bytes::*;
 pub use buffer::*;
+pub use number::*;

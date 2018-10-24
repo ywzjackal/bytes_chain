@@ -1,7 +1,6 @@
 [package]
 name = "bytes_buffer"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["ywzjackal@163.com <ywzjackal@163.com>"]
 
 [dependencies]
-bytes="0.4"
