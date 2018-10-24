@@ -45,6 +45,36 @@ where
     }
 }
 
+impl Number for BytesAble {
+    fn u8(&self, i: usize) -> u8 {
+        tf(self, i)
+    }
+    fn u16_be(&self, i: usize) -> u16 {
+        tf::<u16>(self, i).to_be()
+    }
+    fn u32_be(&self, i: usize) -> u32 {
+        tf::<u32>(self, i).to_be()
+    }
+    fn u64_be(&self, i: usize) -> u64 {
+        tf::<u64>(self, i).to_be()
+    }
+    fn u128_be(&self, i: usize) -> u128 {
+        tf::<u128>(self, i).to_be()
+    }
+    fn u16_le(&self, i: usize) -> u16 {
+        tf::<u16>(self, i).to_le()
+    }
+    fn u32_le(&self, i: usize) -> u32 {
+        tf::<u32>(self, i).to_le()
+    }
+    fn u64_le(&self, i: usize) -> u64 {
+        tf::<u64>(self, i).to_le()
+    }
+    fn u128_le(&self, i: usize) -> u128 {
+        tf::<u128>(self, i).to_le()
+    }
+}
+
 impl<T: BytesAble> Number for T {
     fn u8(&self, i: usize) -> u8 {
         tf(self, i)
