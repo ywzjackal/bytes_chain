@@ -1,4 +1,5 @@
 use buffer::Buffer;
+use ::BytesAble;
 
 pub trait Number {
     fn u8(&self, i: usize) -> u8;
@@ -120,8 +121,8 @@ fn test_number_for_slice() {
 fn test_number_for_buffer() {
     use bytes::Bytes;
     let mut buf = Buffer::new();
-    buf.push(Bytes::from([0x01u8, 0x02]));
-    buf.push(Bytes::from([3, 4, 5, 6, 7, 8, 9, 10]));
+    buf.push(Box::new(Bytes::from([0x01u8, 0x02])));
+    buf.push(Box::new(Bytes::from([3, 4, 5, 6, 7, 8, 9, 10])));
     assert_eq!(1, buf.u8(0));
     assert_eq!(0x04030201, buf.u32_le(0));
     assert_eq!(0x01020304, buf.u32_be(0));

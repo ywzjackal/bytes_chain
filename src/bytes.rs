@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::ops::Index;
 
 pub struct Bytes {
     arc: Arc<dyn AsRef<[u8]>>,
@@ -16,51 +17,59 @@ impl Clone for Bytes {
     }
 }
 
+impl Index<usize> for Bytes {
+    type Output = u8;
+    fn index(&self, i: usize) -> &Self::Output {
+        use ::BytesAble;
+        &self.slice_at(i)[0]
+    }
+}
+
 impl AsRef<[u8]> for Bytes {
     fn as_ref(&self) -> &[u8] {
         &self.arc.as_ref().as_ref()[self.begin..self.end]
     }
 }
 
-impl Bytes{
-
+impl Bytes {
     pub fn from<T: AsRef<[u8]> + 'static>(from: T) -> Self {
         Bytes {
-            begin: 0, end: from.as_ref().len(),
+            begin: 0,
+            end: from.as_ref().len(),
             arc: Arc::new(from),
         }
     }
+}
 
-    pub fn len(&self) -> usize {
+impl ::BytesAble for Bytes {
+    fn len(&self) -> usize {
         self.end - self.begin
     }
-
-    pub fn slice(&self, from: usize, to: usize) -> Self {
+    fn slice(&self, from: usize, to: usize) -> Box<::BytesAble> {
         let mut t = self.clone();
         t.end = t.begin + to;
         t.begin = t.begin + from;
         assert!(t.begin <= t.end);
         assert!(t.end <= self.arc.as_ref().as_ref().len());
-        t
+        Box::new(t)
     }
-
-    pub fn slice_from(&self, from: usize) -> Self {
-        self.slice(from, self.len())
-    }
-
-    pub fn slice_to(&self, to: usize) -> Self {
-        self.slice(0, to)
-    }
-
-    pub fn at(&self, i: usize) -> u8 {
+    fn at(&self, i: usize) -> u8 {
         self.as_ref()[i]
+    }
+    fn slice_at(&self, i: usize) -> &[u8] {
+        &self.as_ref()[i..]
+    }
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+        let l = target.len();
+        target.copy_from_slice(&self.slice_at(from)[..l])
     }
 }
 
-#[test] 
+#[test]
 fn test_bytes_from() {
+    use ::BytesAble;
     Bytes::from([0x0, 0x01]);
-    let b = Bytes::from(vec![0,1,2]);
+    let b = Bytes::from(vec![0, 1, 2]);
     assert_eq!(3, b.len());
     let c = b.slice(1, 3);
     assert_eq!(2, c.len());
