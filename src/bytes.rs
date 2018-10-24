@@ -25,12 +25,6 @@ impl Index<usize> for Bytes {
     }
 }
 
-impl AsRef<[u8]> for Bytes {
-    fn as_ref(&self) -> &[u8] {
-        &self.arc.as_ref().as_ref()[self.begin..self.end]
-    }
-}
-
 impl Bytes {
     pub fn from<T: AsRef<[u8]> + 'static>(from: T) -> Self {
         Bytes {
@@ -38,6 +32,10 @@ impl Bytes {
             end: from.as_ref().len(),
             arc: Arc::new(from),
         }
+    }
+
+    pub fn as_ref(&self) -> &[u8] {
+        &self.arc.as_ref().as_ref()[self.begin..self.end]
     }
 }
 

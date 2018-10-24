@@ -1,4 +1,3 @@
-use buffer::Buffer;
 use ::BytesAble;
 
 pub trait Number {
@@ -31,7 +30,7 @@ where
 }
 
 #[inline]
-fn tf<T>(buf: &Buffer, i: usize) -> T
+fn tf<T>(buf: &BytesAble, i: usize) -> T
 where
     T: Sized + Copy,
 {
@@ -46,40 +45,7 @@ where
     }
 }
 
-impl<T> Number for T
-where
-    T: AsRef<[u8]>,
-{
-    fn u8(&self, i: usize) -> u8 {
-        t(&self.as_ref()[i])
-    }
-    fn u16_be(&self, i: usize) -> u16 {
-        t::<u16>(&self.as_ref()[i]).to_be()
-    }
-    fn u32_be(&self, i: usize) -> u32 {
-        t::<u32>(&self.as_ref()[i]).to_be()
-    }
-    fn u64_be(&self, i: usize) -> u64 {
-        t::<u64>(&self.as_ref()[i]).to_be()
-    }
-    fn u128_be(&self, i: usize) -> u128 {
-        t::<u128>(&self.as_ref()[i]).to_be()
-    }
-    fn u16_le(&self, i: usize) -> u16 {
-        t::<u16>(&self.as_ref()[i]).to_le()
-    }
-    fn u32_le(&self, i: usize) -> u32 {
-        t::<u32>(&self.as_ref()[i]).to_le()
-    }
-    fn u64_le(&self, i: usize) -> u64 {
-        t::<u64>(&self.as_ref()[i]).to_le()
-    }
-    fn u128_le(&self, i: usize) -> u128 {
-        t::<u128>(&self.as_ref()[i]).to_le()
-    }
-}
-
-impl Number for Buffer {
+impl<T: BytesAble> Number for T {
     fn u8(&self, i: usize) -> u8 {
         tf(self, i)
     }
@@ -119,7 +85,8 @@ fn test_number_for_slice() {
 
 #[test]
 fn test_number_for_buffer() {
-    use bytes::Bytes;
+    use ::*;
+    use number::Number;
     let mut buf = Buffer::new();
     buf.push(Box::new(Bytes::from([0x01u8, 0x02])));
     buf.push(Box::new(Bytes::from([3, 4, 5, 6, 7, 8, 9, 10])));

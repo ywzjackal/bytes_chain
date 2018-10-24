@@ -2,7 +2,9 @@ use std::ops::Index;
 
 pub trait BytesAble {
     fn len(&self) -> usize;
-    fn is_empty(&self) -> bool { self.len() == 0 }
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
     fn slice(&self, from: usize, to: usize) -> Box<BytesAble>;
     fn slice_from(&self, from: usize) -> Box<BytesAble> {
         self.slice(from, self.len())
@@ -22,11 +24,29 @@ impl Index<usize> for BytesAble {
     }
 }
 
-mod bytes;
+impl<T: AsRef<[u8]>> BytesAble for T {
+    fn len(&self) -> usize {
+        self.as_ref().len()
+    }
+    fn slice(&self, from: usize, to: usize) -> Box<BytesAble> {
+        Box::new(Bytes::from(Vec::from(&self.as_ref()[from..to])))
+    }
+    fn at(&self, i: usize) -> u8 {
+        self.as_ref()[i]
+    }
+    fn slice_at(&self, i: usize) -> &[u8] {
+        &self.as_ref()[i..]
+    }
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+        let l = target.len();
+        target.copy_from_slice(&self.as_ref()[from..from + l]);
+    }
+}
+
 mod buffer;
+mod bytes;
 mod number;
 
-pub use bytes::*;
 pub use buffer::*;
+pub use bytes::*;
 pub use number::*;
-

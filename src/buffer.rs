@@ -182,11 +182,12 @@ fn test_bytes_buffer_slice() {
 #[test]
 fn test_buffer_in_buffer() {
     use ::*;
+    use number::Number;
     let mut bb1 = Buffer::new();
     bb1.push(Bytes::from([0x01]));
     let mut bb2 = Buffer::new();
     bb2.push(Bytes::from([0x02]));
     bb1.push(bb2);
     assert_eq!(2, bb1.len());
-    assert_eq!(0x0102, bb1.u16_be(0));
+    assert_eq!(0x0102, Number::u16_be(&bb1, 0));
 }
