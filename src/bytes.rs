@@ -64,6 +64,9 @@ impl ::BytesAble for Bytes {
     fn for_each(&self, cb: &mut FnMut(&u8)) {
         self.as_ref().iter().for_each(cb)
     }
+    fn clone_box(&self) -> Box<::BytesAble> {
+        Box::new(self.clone())
+    }
 }
 
 #[test]

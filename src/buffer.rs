@@ -5,6 +5,18 @@ pub struct Buffer {
     bytes: Vec<Box<::BytesAble>>,
 }
 
+impl Clone for Buffer {
+    fn clone(&self) -> Buffer {
+        let mut bytes = Vec::with_capacity(self.bytes.len());
+        for b in self.bytes.iter() {
+            bytes.push(b.clone_box());
+        }
+        Buffer {
+            bytes,
+        }
+    }
+}
+
 impl Buffer {
     pub fn new() -> Self {
         Buffer { bytes: Vec::new() }
@@ -144,6 +156,9 @@ impl ::BytesAble for Buffer {
         for able in self.bytes().iter() {
             able.for_each(cb);
         }
+    }
+    fn clone_box(&self) -> Box<::BytesAble> {
+        Box::new(self.clone())
     }
 }
 

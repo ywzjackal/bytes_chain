@@ -16,6 +16,7 @@ pub trait BytesAble {
     fn slice_at(&self, i: usize) -> &[u8];
     fn copy_to_slice(&self, from: usize, target: &mut [u8]);
     fn for_each(&self, cb: &mut FnMut(&u8));
+    fn clone_box(&self) -> Box<BytesAble>;
 }
 
 impl Index<usize> for BytesAble {
@@ -44,6 +45,9 @@ impl<T: AsRef<[u8]>> BytesAble for T {
     }
     fn for_each(&self, cb:&mut FnMut(&u8)) {
         self.as_ref().iter().for_each(cb)
+    }
+    fn clone_box(&self) -> Box<BytesAble> {
+        Box::new(Bytes::from(Vec::from(self.as_ref())))
     }
 }
 
