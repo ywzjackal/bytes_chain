@@ -1,8 +1,12 @@
 use std::sync::Arc;
 use std::ops::Index;
 
+pub trait IntoBytes {
+    fn into_bytes(self) -> Bytes;
+}
+
 pub struct Bytes {
-    arc: Arc<dyn AsRef<[u8]>>,
+    arc: Arc<Vec<u8>>,
     begin: usize,
     end: usize,
 }
@@ -26,16 +30,18 @@ impl Index<usize> for Bytes {
 }
 
 impl Bytes {
-    pub fn from<T: AsRef<[u8]> + 'static>(from: T) -> Self {
+    pub fn from<T: IntoBytes>(from: T) -> Self {
+        from.into_bytes()
+    }
+
+    pub fn from_arc_vec(from: Arc<Vec<u8>>) -> Self {
         Bytes {
-            begin: 0,
-            end: from.as_ref().len(),
-            arc: Arc::new(from),
+            begin: 0, end: from.len(), arc: from
         }
     }
 
     pub fn as_ref(&self) -> &[u8] {
-        &self.arc.as_ref().as_ref()[self.begin..self.end]
+        &self.arc.as_slice()[self.begin..self.end]
     }
 }
 
@@ -48,7 +54,7 @@ impl ::BytesAble for Bytes {
         t.end = t.begin + to;
         t.begin = t.begin + from;
         assert!(t.begin <= t.end);
-        assert!(t.end <= self.arc.as_ref().as_ref().len());
+        assert!(t.end <= self.arc.as_ref().len());
         Box::new(t)
     }
     fn at(&self, i: usize) -> u8 {
@@ -69,10 +75,31 @@ impl ::BytesAble for Bytes {
     }
 }
 
+// impl<T: AsRef<[u8]>> IntoBytes for T {
+//     fn into_bytes(self) -> Bytes {
+//         Bytes {
+//             begin: 0,
+//             end: self.as_ref().len(),
+//             arc: Arc::new(Vec::from(self.as_ref())),
+//         }
+//     }
+// }
+
+impl<T: Into<Vec<u8>>> IntoBytes for T {
+    fn into_bytes(self) -> Bytes {
+        let vec: Vec<u8> = self.into();
+        Bytes {
+            begin: 0,
+            end: vec.len(),
+            arc: Arc::new(vec),
+        }
+    }
+}
+
 #[test]
 fn test_bytes_from() {
     use ::BytesAble;
-    Bytes::from([0x0, 0x01]);
+    Bytes::from(vec![0x0, 0x01]);
     let b = Bytes::from(vec![0, 1, 2]);
     assert_eq!(3, b.len());
     let c = b.slice(1, 3);

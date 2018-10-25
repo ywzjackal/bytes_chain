@@ -166,19 +166,19 @@ impl ::BytesAble for Buffer {
 fn test_bytes_buffer_normal() {
     use BytesAble;
     let mut bb = Buffer::new();
-    bb.push(Box::new(Bytes::from([0x01, 0x02])));
+    bb.push(Box::new(Bytes::from(vec![0x01, 0x02])));
     assert_eq!(2, bb.len());
     assert_eq!(0x01, bb[0]);
     assert_eq!(0x02, bb[1]);
-    bb.push(Box::new(Bytes::from([0x03, 0x04])));
+    bb.push(Box::new(Bytes::from(vec![0x03, 0x04])));
     assert_eq!(4, bb.len());
     assert_eq!(0x03, bb[2]);
     assert_eq!(0x04, bb[3]);
-    bb.push(Box::new(Bytes::from([])));
+    bb.push(Box::new(Bytes::from(vec![])));
     assert_eq!(4, bb.len());
-    bb.push(Box::new(Bytes::from([0x5])));
+    bb.push(Box::new(Bytes::from(vec![0x5])));
     assert_eq!(5, bb.len());
-    bb.push(Box::new(Bytes::from([0x06, 0x07, 0x08])));
+    bb.push(Box::new(Bytes::from(vec![0x06, 0x07, 0x08])));
     assert_eq!(8, bb.len());
 }
 
@@ -205,9 +205,9 @@ fn test_buffer_in_buffer() {
     use number::Number;
     use *;
     let mut bb1 = Buffer::new();
-    bb1.push(Bytes::from([0x01]));
+    bb1.push(Bytes::from(vec![0x01]));
     let mut bb2 = Buffer::new();
-    bb2.push(Bytes::from([0x02]));
+    bb2.push(Bytes::from(vec![0x02]));
     bb1.push(bb2);
     assert_eq!(2, bb1.len());
     assert_eq!(0x0102, Number::u16_be(&bb1, 0));
