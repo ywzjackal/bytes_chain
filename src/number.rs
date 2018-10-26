@@ -1,4 +1,35 @@
-use ::BytesAble;
+pub trait NumberAble {
+    fn slice_at(&self, i: usize) -> &[u8];
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]);
+}
+
+impl<T: AsRef<[u8]>> NumberAble for T {
+    fn slice_at(&self, i: usize) -> &[u8] {
+        &self.as_ref()[i..]
+    }
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+        let to = from + target.len();
+        target.copy_from_slice(&self.as_ref()[from..to])
+    }
+}
+
+impl NumberAble for ::Buffer {
+    fn slice_at(&self, i: usize) -> &[u8] {
+        self.slice_at(i)
+    }
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+        self.copy_to_slice(from, target)
+    }
+}
+
+impl NumberAble for ::Bytes {
+    fn slice_at(&self, i: usize) -> &[u8] {
+        self.slice_at(i)
+    }
+    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+        self.copy_to_slice(from, target)
+    }
+}
 
 pub trait Number {
     fn u8(&self, i: usize) -> u8;
@@ -9,7 +40,7 @@ pub trait Number {
     fn u64_be(&self, i: usize) -> u64;
     fn u128_be(&self, i: usize) -> u128;
     fn i16_be(&self, i: usize) -> i16 { self.u16_be(i) as i16 }
-    fn i24_be(&self, i: usize) -> i32 { self.i24_be(i) as i32 }
+    fn i24_be(&self, i: usize) -> i32 { self.u24_be(i) as i32 }
     fn i32_be(&self, i: usize) -> i32 { self.u32_be(i) as i32 }
     fn i64_be(&self, i: usize) -> i64 { self.u64_be(i) as i64 }
     fn i128_be(&self, i: usize) -> i128 { self.u128_be(i) as i128 }
@@ -19,7 +50,7 @@ pub trait Number {
     fn u64_le(&self, i: usize) -> u64;
     fn u128_le(&self, i: usize) -> u128;
     fn i16_le(&self, i: usize) -> i16 { self.u16_le(i) as i16 }
-    fn i24_le(&self, i: usize) -> i32 { self.i24_le(i) as i32 }
+    fn i24_le(&self, i: usize) -> i32 { self.u24_le(i) as i32 }
     fn i32_le(&self, i: usize) -> i32 { self.u32_le(i) as i32 }
     fn i64_le(&self, i: usize) -> i64 { self.u64_le(i) as i64 }
     fn i128_le(&self, i: usize) -> i128 { self.u128_le(i) as i128 }
@@ -34,7 +65,7 @@ where
 }
 
 #[inline]
-fn tf<T>(buf: &BytesAble, i: usize) -> T
+fn tf<T>(buf: &NumberAble, i: usize) -> T
 where
     T: Sized + Copy,
 {
@@ -49,7 +80,7 @@ where
     }
 }
 
-impl<T: BytesAble> Number for T {
+impl<T: NumberAble> Number for T {
     fn u8(&self, i: usize) -> u8 {
         tf(self, i)
     }
@@ -102,8 +133,8 @@ fn test_number_for_buffer() {
     use ::*;
     use number::Number;
     let mut buf = Buffer::new();
-    buf.push(Box::new(Bytes::from(vec![0x01u8, 0x02])));
-    buf.push(Box::new(Bytes::from(vec![3, 4, 5, 6, 7, 8, 9, 10])));
+    buf.push(Bytes::from(vec![0x01u8, 0x02]));
+    buf.push(Bytes::from(vec![3, 4, 5, 6, 7, 8, 9, 10]));
     assert_eq!(1, buf.u8(0));
     assert_eq!(0x04030201, buf.u32_le(0));
     assert_eq!(0x01020304, buf.u32_be(0));
