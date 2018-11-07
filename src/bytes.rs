@@ -58,12 +58,12 @@ impl Bytes {
         &self.arc.as_ref()[self.begin + from..]
     }
 
-    pub fn truncate_from(&mut self, from: usize) {
+    pub fn advance(&mut self, from: usize) {
         assert!(from < self.len());
         self.begin += from;
     }
 
-    pub fn truncate_to(&mut self, to: usize) {
+    pub fn truncate(&mut self, to: usize) {
         assert!(to < self.len());
         self.end -= self.len() - to;
     }
@@ -92,8 +92,8 @@ impl Bytes {
 
     pub fn truncate(&mut self, from: usize, to: usize) {
         assert!(from <= to);
-        self.truncate_to(to);
-        self.truncate_from(from);
+        self.truncate(to);
+        self.advance(from);
     }
 
     pub fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
@@ -150,11 +150,11 @@ fn test_bytes_slice() {
 fn test_bytes_truncate() {
     let mut bytes = Bytes::from(vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     assert_eq!(11, bytes.len());
-    bytes.truncate_to(10); // 0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    bytes.truncate(10); // 0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9
     assert_eq!(10, bytes.len());
     assert_eq!(0, bytes[0]);
     assert_eq!(9, bytes[9]);
-    bytes.truncate_from(1); // 1, 2, 3, 4, 5, 6, 7, 8, 9
+    bytes.advance(1); // 1, 2, 3, 4, 5, 6, 7, 8, 9
     assert_eq!(9, bytes.len());
     assert_eq!(1, bytes[0]);
     assert_eq!(9, bytes[8]);

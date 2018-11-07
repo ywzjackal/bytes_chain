@@ -65,7 +65,7 @@ impl Buffer {
         self.slice(0, to)
     }
 
-    pub fn truncate_from(&mut self, mut from: usize) {
+    pub fn advance(&mut self, mut from: usize) {
         assert!(from < self.len());
         if from == 0 {
             return;
@@ -74,10 +74,10 @@ impl Buffer {
             let bytes = self.0.pop_front().unwrap();
             from -= bytes.len();
         }
-        self.0[0].truncate_from(from);
+        self.0[0].advance(from);
     }
 
-    pub fn truncate_to(&mut self, to: usize) {
+    pub fn truncate(&mut self, to: usize) {
         assert!(to <= self.len());
         if to == self.len() {
             return;
@@ -88,24 +88,18 @@ impl Buffer {
             droped -= bytes.len();
         }
         let last = self.0.len() - 1;
-        self.0[last].end -= droped;
-    }
-    
-    pub fn truncate(&mut self, from: usize, to: usize) {
-        assert!(from <= to);
-        self.truncate_to(to);
-        self.truncate_from(from);
+        self.0[last].truncate(droped);
     }
 
     pub fn take_from(&mut self, from: usize) -> Buffer {
         let rt = self.slice_from(from);
-        self.truncate_to(from);
+        self.truncate(from);
         rt
     }
 
     pub fn take_to(&mut self, to: usize) -> Buffer {
         let rt = self.slice_to(to);
-        self.truncate_from(to);
+        self.advance(to);
         rt
     }
 
@@ -137,10 +131,9 @@ impl Buffer {
         }
         panic!("copy_to_slice remaining space can not fill data")
     }
-    pub fn for_each(&self, cb: &mut FnMut(&u8)) {
-        for able in self.0.iter() {
-            able.for_each(cb);
-        }
+
+    pub fn iter(&self) -> impl Iterator<Item=u8> + '_ {
+        self.0.iter().flatten()
     }
 }
 
@@ -219,15 +212,16 @@ fn test_buffer_truncate() {
     bb.push(Bytes::from(&[0x05][..]));
     bb.push(Bytes::from(&[0x06, 0x07, 0x08, 0x09, 0x0a][..]));
     assert_eq!(11, bb.len());
-    bb.truncate_to(10); // 0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    bb.truncate(10); // 0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9
     assert_eq!(10, bb.len());
     assert_eq!(0, bb[0]);
     assert_eq!(9, bb[9]);
-    bb.truncate_from(1); // 1, 2, 3, 4, 5, 6, 7, 8, 9
+    bb.advance(1); // 1, 2, 3, 4, 5, 6, 7, 8, 9
     assert_eq!(9, bb.len());
     assert_eq!(1, bb[0]);
     assert_eq!(9, bb[8]);
-    bb.truncate(1, 8); // 2, 3, 4, 5, 6, 7, 8
+    bb.truncate(8); 
+    bb.advance(1);// 2, 3, 4, 5, 6, 7, 8
     assert_eq!(7, bb.len());
     assert_eq!(2, bb[0]);
     assert_eq!(8, bb[6]);
@@ -245,6 +239,8 @@ fn test_buffer_in_buffer() {
     assert_eq!(2, bb1.len());
     assert_eq!(0x0102, Number::u16_be(&bb1, 0));
     let mut target = Vec::new();
-    bb1.for_each(&mut |v| target.push(*v));
+    for b in bb1.iter() {
+        target.push(b);
+    }
     assert_eq!(target.as_slice(), &[1, 2]);
 }

@@ -22,14 +22,14 @@ impl NumberAble for ::Buffer {
     }
 }
 
-impl NumberAble for ::Bytes {
-    fn slice_at(&self, i: usize) -> &[u8] {
-        self.slice_at(i)
-    }
-    fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
-        self.copy_to_slice(from, target)
-    }
-}
+// impl NumberAble for ::Bytes {
+//     fn slice_at(&self, i: usize) -> &[u8] {
+//         self.slice_at(i)
+//     }
+//     fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
+//         self.copy_to_slice(from, target)
+//     }
+// }
 
 pub trait Number {
     fn u8(&self, i: usize) -> u8;
