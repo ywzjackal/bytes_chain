@@ -87,8 +87,10 @@ impl Buffer {
             let bytes = self.0.pop_back().unwrap();
             droped -= bytes.len();
         }
-        let last = self.0.len() - 1;
-        self.0[last].truncate(droped);
+        let l = self.0.len() - 1;
+        let last = &mut self.0[l];
+        let last_len = last.len();
+        last.truncate(last_len - droped);
     }
 
     pub fn take_from(&mut self, from: usize) -> Buffer {
@@ -204,7 +206,7 @@ fn test_bytes_buffer_slice() {
 
 #[test]
 fn test_buffer_truncate() {
-    let mut bb = Buffer::new(); // 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    let mut bb = Buffer::new(); // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     bb.push(Bytes::from(&[0x00, 0x01][..]));
     bb.push(Bytes::from(&[0x02][..]));
     bb.push(Bytes::from(&[0x03][..]));
@@ -212,7 +214,9 @@ fn test_buffer_truncate() {
     bb.push(Bytes::from(&[0x05][..]));
     bb.push(Bytes::from(&[0x06, 0x07, 0x08, 0x09, 0x0a][..]));
     assert_eq!(11, bb.len());
+    println!("{:?}", bb);
     bb.truncate(10); // 0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    println!("{:?}", bb);
     assert_eq!(10, bb.len());
     assert_eq!(0, bb[0]);
     assert_eq!(9, bb[9]);
