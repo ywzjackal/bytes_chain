@@ -1,6 +1,7 @@
 pub trait NumberAble {
     fn slice_at(&self, i: usize) -> &[u8];
     fn copy_to_slice(&self, from: usize, target: &mut [u8]);
+    fn len(&self) -> usize;
 }
 
 impl<T: AsRef<[u8]>> NumberAble for T {
@@ -11,6 +12,9 @@ impl<T: AsRef<[u8]>> NumberAble for T {
         let to = from + target.len();
         target.copy_from_slice(&self.as_ref()[from..to])
     }
+    fn len(&self) -> usize {
+        self.as_ref().len()
+    }
 }
 
 impl NumberAble for ::Buffer {
@@ -19,6 +23,9 @@ impl NumberAble for ::Buffer {
     }
     fn copy_to_slice(&self, from: usize, target: &mut [u8]) {
         self.copy_to_slice(from, target)
+    }
+    fn len(&self) -> usize {
+        self.len()
     }
 }
 

@@ -5,7 +5,7 @@ use *;
 const MIN_UNIT_SIZE: usize = 64;
 
 #[derive(Clone, Debug)]
-pub struct Buffer(pub(crate) VecDeque<Bytes>);
+pub struct Buffer(pub VecDeque<Bytes>);
 
 impl Buffer {
     pub fn new() -> Self {
@@ -92,7 +92,12 @@ impl Buffer {
     }
 
     pub fn advance(&mut self, mut from: usize) {
-        assert!(from < self.len());
+        let sl = self.len();
+        assert!(from <= sl);
+        if from == sl {
+            self.clear();
+            return;
+        }
         if from == 0 {
             return;
         }
