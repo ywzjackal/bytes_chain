@@ -17,7 +17,7 @@ impl<T: AsRef<[u8]>> NumberAble for T {
     }
 }
 
-impl NumberAble for ::Buffer {
+impl NumberAble for crate::Buffer {
     fn slice_at(&self, i: usize) -> &[u8] {
         self.slice_at(i)
     }
@@ -137,8 +137,8 @@ fn test_number_for_slice() {
 
 #[test]
 fn test_number_for_buffer() {
-    use ::*;
-    use number::Number;
+    use crate::*;
+    use bytes::Bytes;
     let mut buf = Buffer::new();
     buf.push(Bytes::from(vec![0x01u8, 0x02]));
     buf.push(Bytes::from(vec![3, 4, 5, 6, 7, 8, 9, 10]));

@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::ops::Index;
-use *;
+use bytes::Bytes;
+use crate::NumberAble;
 
 const MIN_UNIT_SIZE: usize = 64;
 
@@ -137,6 +138,7 @@ impl Buffer {
     }
 
     pub fn slice_at(&self, mut i: usize) -> &[u8] {
+        use crate::NumberAble;
         for b in self.0.iter() {
             if i < b.len() {
                 return &b.slice_at(i);
@@ -264,8 +266,7 @@ fn test_buffer_truncate() {
 
 #[test]
 fn test_buffer_in_buffer() {
-    use number::Number;
-    use *;
+    use crate::Number;
     let mut bb1 = Buffer::new();
     bb1.push(Bytes::from(vec![0x01]));
     let mut bb2 = Buffer::new();
