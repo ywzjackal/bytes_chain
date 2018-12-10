@@ -61,6 +61,8 @@ pub trait Number {
     fn i32_le(&self, i: usize) -> i32 { self.u32_le(i) as i32 }
     fn i64_le(&self, i: usize) -> i64 { self.u64_le(i) as i64 }
     fn i128_le(&self, i: usize) -> i128 { self.u128_le(i) as i128 }
+    /// eq to method `len`
+    fn size(&self) -> usize;
 }
 
 #[inline]
@@ -125,6 +127,7 @@ impl<T: NumberAble> Number for T {
     fn u128_le(&self, i: usize) -> u128 {
         tf::<u128>(self, i).to_le()
     }
+    fn size(&self) -> usize { self.len() }
 }
 
 #[test]
